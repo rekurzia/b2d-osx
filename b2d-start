@@ -1,0 +1,3 @@
+#!/bin/bash
+
+boot2docker start --vbox-share=disable
