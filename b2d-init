@@ -1,0 +1,37 @@
+#!/bin/bash
+
+ME=$(whoami)
+VM_NAME="docker-vm"
+
+# create clean VM in virtualbox
+docker-machine create --driver virtualbox $VM_NAME
+
+VM_IP=$(docker-machine ip $VM_NAME)
+
+docker-machine stop $VM_NAME
+
+# disable standard shared folder
+VBoxManage sharedfolder remove $VM_NAME --name Users
+
+docker-machine start $VM_NAME
+
+# setup ~/.bash_profile
+echo "setup ~/.bash_profile"
+echo '' >> $HOME/.bash_profile
+echo '# docker VM init' >> $HOME/.bash_profile
+echo 'eval "$(docker-machine env docker-vm)"' >> $HOME/.bash_profile
+echo '' >> $HOME/.bash_profile
+
+# setup NFS share on host machine
+echo "setup NFS share on host machine"
+echo "echo '# docker-vm' >> /etc/exports" | sudo bash
+echo "echo \"$HOME\" -alldirs -mapall=$ME -network 192.168.99.0 -mask 255.255.255.0 >> /etc/exports" | sudo bash
+echo "echo '' >> /etc/exports" | sudo bash
+sudo nfsd checkexports && sudo nfsd restart
+
+# setup NFS mount in VM
+echo "setup NFS mount in VM"
+docker-machine ssh $VM_NAME "echo '#!/bin/sh' | sudo tee /var/lib/boot2docker/bootlocal.sh && sudo chmod 755 /var/lib/boot2docker/bootlocal.sh"
+docker-machine ssh $VM_NAME "echo \"sudo mkdir -p $HOME\" | sudo tee -a /var/lib/boot2docker/bootlocal.sh"
+docker-machine ssh $VM_NAME "echo \"sudo mount -t nfs -o noatime,soft,nolock,vers=3,udp,proto=udp,rsize=8192,wsize=8192,namlen=255,timeo=10,retrans=3,nfsvers=3 -v 192.168.99.1:$HOME $HOME\" | sudo tee -a /var/lib/boot2docker/bootlocal.sh"
+docker-machine restart $VM_NAME
