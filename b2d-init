@@ -33,5 +33,5 @@ sudo nfsd checkexports && sudo nfsd restart
 echo "setup NFS mount in VM"
 docker-machine ssh $VM_NAME "echo '#!/bin/sh' | sudo tee /var/lib/boot2docker/bootlocal.sh && sudo chmod 755 /var/lib/boot2docker/bootlocal.sh"
 docker-machine ssh $VM_NAME "echo \"sudo mkdir -p $HOME\" | sudo tee -a /var/lib/boot2docker/bootlocal.sh"
-docker-machine ssh $VM_NAME "echo \"sudo mount -t nfs -o noatime,soft,nolock,vers=3,udp,proto=udp,rsize=8192,wsize=8192,namlen=255,timeo=10,retrans=3,nfsvers=3 -v 192.168.99.1:$HOME $HOME\" | sudo tee -a /var/lib/boot2docker/bootlocal.sh"
+docker-machine ssh $VM_NAME "echo \"sudo mount -t nfs -o noatime,soft,nolock,vers=3,udp,proto=udp,rsize=8192,wsize=8192,namlen=255,timeo=10,retrans=3,nfsvers=3,acregmin=2,acregmax=15,acdirmin=2,acdirmax=15 -v 192.168.99.1:$HOME $HOME\" | sudo tee -a /var/lib/boot2docker/bootlocal.sh"
 docker-machine restart $VM_NAME
