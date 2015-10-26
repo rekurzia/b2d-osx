@@ -1,10 +1,16 @@
-# b2d-osx
-boot2docker tuned for OSX based on [blackfire.io blogpost](http://blog.blackfire.io/how-we-use-docker.html)
+# [Docker machine](https://www.docker.com/docker-machine) tuned for OSX
 
-### TODO
+VirtualBox machine for running docker tuned for OSX
 
-- create VM via docker machine
-- disable standard shared folder in VM
-- terminal init `eval "$(docker-machine env docker-vm)"`
-- setup NFS sharing on OSX machine
-- setup NFS mount on boot2docker virtual machine
+## Commands
+
+### b2d-init
+creates virtual machine (VM) called `docker-vm` in your VirtualBox and setup NFS mount from the VM to your host machine (OSX).
+
+```sh  
+$ ./b2d-init
+```
+
+===
+*insired by [blackfire.io](http://blog.blackfire.io/how-we-use-docker.html)*
+
